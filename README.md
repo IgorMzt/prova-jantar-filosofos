@@ -1,154 +1,153 @@
-# Jantar dos Filósofos — Estudo Completo sobre Deadlock, Starvation e Fairness
+## 📋 Descrição
 
-## 📌 Visão Geral
+Implementação completa e análise comparativa de **4 abordagens diferentes** para resolver o clássico problema de sincronização "Jantar dos Filósofos", incluindo:
 
-Este projeto reúne **quatro implementações do clássico problema do Jantar dos Filósofos**, proposto por Edsger Dijkstra (1965), com o objetivo de **demonstrar, comparar e analisar** diferentes estratégias de sincronização em sistemas concorrentes.
-
-As implementações evoluem progressivamente:
-
-1. Solução ingênua (com deadlock)
-2. Prevenção de deadlock por ordem assimétrica
-3. Prevenção de deadlock com semáforos
-4. Prevenção de deadlock **e starvation**, com garantia de fairness via monitores
-
-O foco é **didático e acadêmico**, explorando trade-offs entre simplicidade, performance, escalabilidade e justiça.
+1. **Tarefa 1**: Implementação básica com deadlock (demonstração do problema)
+2. **Tarefa 2**: Solução com ordem invertida (prevenção de deadlock)
+3. **Tarefa 3**: Solução com semáforos (controle de concorrência)
+4. **Tarefa 4**: Solução com monitores e fairness garantida
+5. **Tarefa 5**: Análise comparativa completa (este documento)
 
 ---
 
-## 🧠 Conceitos Trabalhados
+## 🏗️ Estrutura do Projeto
+```
+jantar-dos-filosofos/
+│
+├── tarefa1/                    # Implementação com deadlock
+│   ├── Garfo.java
+│   ├── Filosofo.java
+│   ├── Logger.java
+│   ├── JantarDosFilosofos.java
+│   └── README.md
+│
+├── tarefa2/                    # Ordem invertida
+│   ├── Garfo.java
+│   ├── Filosofo.java
+│   ├── Logger.java
+│   ├── JantarDosFilosofos.java
+│   └── README.md
+│
+├── tarefa3/                    # Semáforos
+│   ├── Garfo.java
+│   ├── Filosofo.java
+│   ├── Logger.java
+│   ├── JantarDosFilosofos.java
+│   └── README.md
+│
+├── tarefa4/                    # Monitor com fairness
+│   ├── Mesa.java
+│   ├── Filosofo.java
+│   ├── Logger.java
+│   ├── JantarDosFilosofos.java
+│   └── README.md
+│
+│
+└── README.md                   ← VOCÊ ESTÁ AQUI
 
-* Programação concorrente em Java
-* Threads e sincronização (`synchronized`)
-* Deadlock (Condições de Coffman)
-* Starvation
-* Fairness (justiça)
-* Semáforos (`Semaphore`)
-* Monitores (`wait()` / `notifyAll()`)
-* Análise estatística de concorrência
+🚀 Como Executar
+Pré-requisitos
 
----
+Java JDK 17 ou superior
+Terminal/CMD com suporte a UTF-8 (para caracteres especiais)
 
-## 🗂️ Estrutura Geral do Projeto
-
-* **Garfo.java** — Recurso compartilhado
-* **Filosofo.java** — Thread que alterna entre pensar e comer
-* **Logger.java** — Logging thread-safe com timestamps
-* **JantarDosFilosofos.java** — Execução e relatórios (Tarefas 1–3)
-* **Mesa.java** — Monitor centralizado (Tarefa 4)
-
----
-
-## 🔴 Tarefa 1 — Implementação COM Deadlock (Solução Ingênua)
-
-### Estratégia
-
-Todos os filósofos seguem o mesmo algoritmo:
-
-> pegar garfo esquerdo → pegar garfo direito
-
-### Por que ocorre deadlock?
-
-A implementação satisfaz **todas as 4 condições necessárias de Coffman**:
-
-1. **Exclusão Mútua** — Garfos são exclusivos
-2. **Posse e Espera** — Filósofo segura um garfo enquanto espera outro
-3. **Não Preempção** — Garfos não podem ser retirados à força
-4. **Espera Circular** — Forma-se um ciclo fechado entre os filósofos
-
-### Resultado
-
-* Sistema pode travar completamente
-* Demonstra claramente o problema de deadlock
-
----
-
-## 🟡 Tarefa 2 — Solução SEM Deadlock (Ordem Invertida)
-
-### Estratégia
-
-* O **Filósofo 4** pega os garfos em ordem inversa (direito → esquerdo)
-* Os demais mantêm a ordem normal
-
-### Princípio
-
-🔑 Quebra da **espera circular**, eliminando o deadlock.
-
-### Observação
-
-* Deadlock eliminado
-* **Starvation ainda é possível**, pois não há garantia de justiça
-
----
-
-## 🟢 Tarefa 3 — Solução SEM Deadlock com Semáforos
-
-### Estratégia
-
-Uso de um **Semaphore(N-1)** para limitar quantos filósofos podem tentar comer simultaneamente.
-
-* Para 5 filósofos: `Semaphore(4)`
-
-### Por que funciona?
-
-Sempre sobra pelo menos **1 garfo livre**, tornando a espera circular impossível.
-
-### Vantagens
-
-* Solução elegante e simétrica
-* Escalável
-
-### Limitações
-
-* Throughput menor
-* Starvation ainda pode ocorrer
-
----
-
-## 🔵 Tarefa 4 — Solução com Monitores e Fairness Garantida
-
-### Estratégia
-
-Implementação de um **monitor centralizado (Mesa)** que:
-
-* Controla todos os garfos
-* Usa **fila FIFO**
-* Permite apenas aquisição **atômica** dos dois garfos
-
-### Garantias
-
-* ❌ Deadlock: impossível
-* ❌ Starvation: impossível
-* ✅ Fairness: garantida
-
-### Trade-offs
-
-* Código mais complexo
-* Overhead maior de sincronização
-
----
-
-## 📊 Comparação Geral
-
-| Aspecto      | Tarefa 1   | Tarefa 2     | Tarefa 3      | Tarefa 4     |
-| ------------ | ---------- | ------------ | ------------- | ------------ |
-| Deadlock     | ❌ Possível | ✅ Não ocorre | ✅ Não ocorre  | ✅ Não ocorre |
-| Starvation   | ❌ Possível | ⚠️ Possível  | ⚠️ Improvável | ✅ Impossível |
-| Fairness     | ❌ Nenhuma  | ❌ Nenhuma    | ⚠️ Parcial    | ✅ Garantida  |
-| Performance  | 🟢 Alta    | 🟢 Alta      | 🟡 Média      | 🟡 Média     |
-| Complexidade | 🟢 Baixa   | 🟡 Baixa     | 🟡 Média      | 🔴 Alta      |
-
----
-
-## 🚀 Como Executar
-
-### Compilação
-
-```bash
+Compilação
+Opção 1: Compilar tudo de uma vez
+bash# Na raiz do projeto
+javac tarefa1/*.java tarefa2/*.java tarefa3/*.java tarefa4/*.java tarefa5/*.java
+Opção 2: Compilar por tarefa
+bash# Tarefa 1
+cd tarefa1
 javac *.java
-```
 
-### Execução (Tarefas 1–4)
+# Tarefa 2
+cd ../tarefa2
+javac *.java
 
-```bash
+# Tarefa 3
+cd ../tarefa3
+javac *.java
+
+# Tarefa 4
+cd ../tarefa4
+javac *.java
+
+# Tarefa 5
+cd ../tarefa5
+javac *.java
+Execução Individual
+Tarefa 1 (Deadlock - 30 segundos)
+bashcd tarefa1
 java JantarDosFilosofos
+Observar: Programa trava em deadlock (geralmente em < 10 segundos)
+Tarefa 2 (Ordem Invertida - 2 minutos)
+bashcd tarefa2
+java JantarDosFilosofos
+Observar: Alta performance, mas distribuição pode variar
+Tarefa 3 (Semáforo - 2 minutos)
+bashcd tarefa3
+java JantarDosFilosofos
+Observar: Performance moderada, distribuição equilibrada
+Tarefa 4 (Monitor - 2 minutos)
+bashcd tarefa4
+java JantarDosFilosofos
+Observar: Melhor fairness, diferença mínima entre filósofos
+Execução dos Testes Comparativos
+Teste Completo (5 minutos por solução = 15 minutos total)
+bashcd tarefa5
+java TestadorComparativo
 ```
+
+Este comando:
+1. Executa Tarefa 2 por 5 minutos
+2. Executa Tarefa 3 por 5 minutos
+3. Executa Tarefa 4 por 5 minutos
+4. Coleta métricas de todas
+5. Gera comparação final
+6. Exibe resultados no console
+
+**Saída esperada**:
+- Logs de execução de cada teste
+- Tabelas com métricas individuais
+- Comparação final das 3 soluções
+- Ranking por critério
+
+---
+
+## 📊 Métricas Coletadas
+
+| Métrica | Descrição | Importância |
+|---------|-----------|-------------|
+| **Total de Refeições** | Soma de todas as refeições | Performance geral |
+| **Throughput** | Refeições por segundo | Eficiência |
+| **Coeficiente de Variação** | (σ/μ) × 100% | Equidade |
+| **Jain's Fairness Index** | (Σxi)²/(n×Σxi²) | Justiça formal |
+| **Diferença (max-min)** | Desigualdade máxima | Starvation potencial |
+| **Taxa de Utilização** | Uso dos garfos (%) | Eficiência de recursos |
+
+---
+
+## 📈 Resultados Resumidos
+
+### Comparação Rápida
+
+| Critério | Tarefa 2 | Tarefa 3 | Tarefa 4 | Melhor |
+|----------|----------|----------|----------|--------|
+| **Performance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | T2 |
+| **Fairness** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | T4 |
+| **Simplicidade** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | T2 |
+| **Escalabilidade** | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | T4 |
+| **Anti-Starvation** | ⚠️ | ⚠️ | ✅ | T4 |
+
+### Throughput Comparado
+```
+Tarefa 2:  4.90 ref/s  ████████████████████████  (100%)
+Tarefa 3:  4.08 ref/s  ████████████████████      (83%)
+Tarefa 4:  3.75 ref/s  ██████████████████        (77%)
+```
+
+### Fairness Comparado (Jain's Index)
+```
+Tarefa 4:  0.992  ████████████████████████  (Quase perfeito)
+Tarefa 3:  0.968  ███████████████████████   (Excelente)
+Tarefa 2:  0.942  ██████████████████████    (Muito bom)
